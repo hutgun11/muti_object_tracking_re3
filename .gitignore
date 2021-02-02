@@ -10,3 +10,4 @@ labels/
 *.json
 *venv
 .idea
+*.MOV
