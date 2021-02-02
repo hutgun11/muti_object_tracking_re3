@@ -40,7 +40,7 @@ def main(status_pause=False,index=0,last_file=None):
 
         elif event == cv2.EVENT_MOUSEMOVE:
             if drawing == True:
-                cv2.rectangle(img,(ix,iy),(x,y),(0,255,0),1)
+                # cv2.rectangle(img,(ix,iy),(x,y),(0,255,0),1)
                 a=x
                 b=y
                 if a != x | b != y:

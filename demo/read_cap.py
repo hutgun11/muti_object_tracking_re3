@@ -4,7 +4,7 @@ import math
 import os
 from PIL import Image
 
-path_video='video/IMG_9500.MOV'
+path_video='video/IMG_9504.MOV'
 classname='tea_plus_rootbeer'
 def resize(image):
     w_resize =576
