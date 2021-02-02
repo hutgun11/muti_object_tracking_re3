@@ -109,10 +109,13 @@ if __name__ == '__main__':
             description='Show the Webcam demo.')
     parser.add_argument('-r', '--record', action='store_true', default=False)
     args = parser.parse_args()
-    RECORD = args.record
+    # RECORD = args.record
+    #gunfix
+    RECORD = True
+    #gunfix
 
     tracker = re3_tracker.Re3Tracker()
 
-    show_webcam(mirror=True)
+    show_webcam(mirror=False)
 
 

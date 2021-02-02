@@ -23,6 +23,7 @@ initial_bbox = [190, 158, 249, 215]
 tracker.track('ball', image_paths[0], initial_bbox)
 print('ball track started')
 for ii,image_path in enumerate(image_paths):
+    print('cola',ii)
     image = cv2.imread(image_path)
     # Tracker expects RGB, but opencv loads BGR.
     imageRGB = image[:,:,::-1]
@@ -35,6 +36,11 @@ for ii,image_path in enumerate(image_paths):
                 (int(bbox[0]), int(bbox[1])),
                 (int(bbox[2]), int(bbox[3])),
                 color, 2)
+        #gunfix
+        # cv2.rectangle(image,
+        #         (int(initial_bbox[0]), int(initial_bbox[1])),
+        #         (int(initial_bbox[2]), int(initial_bbox[3])),
+        #         color, 5)
     elif ii == 100:
         # Start a new track, but continue the first as well. Only the new track needs an initial bounding box.
         bboxes = tracker.multi_track(['ball', 'logo'], imageRGB, {'logo' : [399, 20, 428, 45]})
