@@ -1,6 +1,0 @@
-rootbeer@1
-rootbeer@2
-rootbeer@3
-rootbeer@4
-rootbeer@5
-rootbeer@6

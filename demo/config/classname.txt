@@ -1,10 +1,6 @@
 rootbeer@1
 rootbeer@2
-gatarate
-lipton
-coke
-fanta
-tea@1
-tea@2
-blackpink@1
-blackpink@2
+rootbeer@3
+rootbeer@4
+rootbeer@5
+rootbeer@6

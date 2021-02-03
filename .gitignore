@@ -11,3 +11,4 @@ labels/
 *venv
 .idea
 *.MOV
+*.xml

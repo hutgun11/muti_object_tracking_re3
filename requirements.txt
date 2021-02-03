@@ -7,3 +7,4 @@ Pillow
 xml-python
 pandas
 regex
+Shapely
