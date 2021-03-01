@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+chmod +x start_1.sh
 conda create -n myenv  python=3.6
 source activate myenv
 pip install tensorflow==1.5.0
