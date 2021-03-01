@@ -220,7 +220,7 @@ def main(status_pause=False,index=0,last_file=None):
     #track object
     #df
     df=pd.DataFrame(li)
-    df.to_csv('test.csv',index=False)
+    # df.to_csv('test.csv',index=False)
 
 
 

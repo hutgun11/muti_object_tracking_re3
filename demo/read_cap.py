@@ -3,11 +3,27 @@ import cv2
 import math
 import os
 from PIL import Image
+from datetime import datetime
 
-path_video='video/IMG_9504.MOV'
-classname='tea_plus_rootbeer'
+folder='video/'
+folder_success='video_success/'
+# filevideo='gun_1.MOV'
+# path_video='video/IMG_9556.MOV'
+for subdir,dirs,files in os.walk(folder):
+    for file in files:
+        path_video=os.path.join(folder,file)
+        path_move = os.path.join(folder_success,file)
+# path_video=os.path.join(folder,filevideo)
+
+
+
+# classname='tea_plus_rootbeer'
+# classname=filevideo.strip('mp4MOVmov.')+'_'+datetime.today().strftime('%Y_%m_%d')+'_'
+classname=file.strip('mp4MOVmov.')+'_'+datetime.today().strftime('%Y_%m_%d')+'_'
+
 def resize(image):
-    w_resize =576
+    # w_resize =768#for 3:4
+    w_resize =576#for 9:16
     (img_h,img_w,_)=image.shape
     if img_w > w_resize:
         r =w_resize/img_w
@@ -17,7 +33,8 @@ def resize(image):
 def cut_frame(path_video,classname):
     vidcap =cv2.VideoCapture(path_video)
     success,image = vidcap.read()
-    seconds=0.2
+    # seconds=0.2
+    seconds=0.17
     fps =vidcap.get(cv2.CAP_PROP_FPS)
     multiplier=int(fps*seconds)
 
@@ -30,4 +47,15 @@ def cut_frame(path_video,classname):
         if frameId % multiplier == 0 :
             cv2.imwrite(path_output,image)
             print(frameId,path_output)
-cut_frame(path_video,classname)
+    return "success"
+    # vidcap.()
+def main_capture():
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    try:
+        cut_frame(path_video,classname)
+        if not os.path.exists('video_success'):
+            os.makedirs('video_success')
+    except:
+        pass
+    return path_video,path_move

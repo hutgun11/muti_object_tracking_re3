@@ -1,4 +1,0 @@
-tea plus,4
-tea plus_no,2
-rootbeer,6
-blackpink can,2

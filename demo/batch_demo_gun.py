@@ -11,17 +11,39 @@ import xml.etree.cElementTree as ET
 # from read_cap import *
 # from tracker import re3_tracker
 from tracker import re3_tracker
-
+from read_cap import main_capture
+from datetime import datetime
 import natsort 
+import shutil
 tracker = re3_tracker.Re3Tracker()
 # status_pause=True
+path_video,path_move=main_capture()#capture video to images 
 index=0
 last_file=None
 round_counter=1
 start=True
 status_pause=False
 image_paths = natsort.natsorted(glob.glob(os.path.join(os.path.dirname(__file__), 'data', '*.jpg')))#path data
-threshold_iou=13
+threshold_iou=20
+percent_sku=20
+def check_size_sku(size_draw_box,w,h,bb,class_sku,percent_sku):
+    if size_draw_box[bb]['class'] == class_sku:
+        percent_width=size_draw_box[bb]['width']*(percent_sku/100)
+        percent_height=size_draw_box[bb]['height']*(percent_sku/100)
+        width1_range=int(size_draw_box[bb]['width']-percent_width)
+        width2_range=int(size_draw_box[bb]['width']+percent_width)
+        height1_range=int(size_draw_box[bb]['height']-percent_height)
+        height2_range=int(size_draw_box[bb]['height']+percent_height)
+        range_width=range(width1_range,width2_range)
+        range_height=range(height1_range,height2_range)
+        print(width1_range,w,width2_range,height1_range,h,height2_range,class_sku,size_draw_box[bb]['class'])
+        
+        if w in range_width and h in range_height:
+            size_sku=True
+        else:
+            size_sku=False
+    return size_sku,w in range_width, h in range_height
+            
 def cal_iou(bb1,bb2):
     x_left=max(bb1['x1'],bb2['x1'])
     y_top=max(bb1['y1'],bb2['y1'])
@@ -137,7 +159,6 @@ def write_xml(li,width,height,depth):
                     ET.SubElement(bndbox,"ymax").text=str(int(df['y2'][index]))
 
 def main(status_pause=False,index=0,last_file=None,start=True):
-
     '''
         read classname.txt to list
     '''
@@ -179,6 +200,7 @@ def main(status_pause=False,index=0,last_file=None,start=True):
         y2=y
         
         boxDraw=[x1,y1,x2,y2]
+
         # print(boxDraw)
 
     # image_paths = natsort.natsorted(glob.glob(os.path.join(os.path.dirname(__file__), 'data', '*.jpg')))#path data
@@ -200,12 +222,14 @@ def main(status_pause=False,index=0,last_file=None,start=True):
     # cv2.namedWindow('Webcam', cv2.WINDOW_NORMAL)
     cv2.resizeWindow('image', width, height)
     initial_bbox=[]
+    size_draw_box=[]
     while(1):
         cv2.imshow('image',img)
 
         k = cv2.waitKey(1) & 0xFF
         if k == ord('s'):
             print('Drawbox :',boxDraw,'class :',classname[counter_class])
+            # print('width',boxDraw[2]-boxDraw[0],'height',boxDraw[3]-boxDraw[1],'class',classname[counter_class])
             try:
                 print('nextclass :'+classname[counter_class+1])
             except:
@@ -213,7 +237,13 @@ def main(status_pause=False,index=0,last_file=None,start=True):
                 pass
             counter_class+=1
             initial_bbox.append(boxDraw)
-
+            # print('width',boxDraw[2]-boxDraw[0],'height',boxDraw[3]-boxDraw[1])
+            try:
+                size_draw_box.append({'width':boxDraw[2]-boxDraw[0],'height':boxDraw[3]-boxDraw[1],'class':classname[counter_class-1]})
+            except:
+                pass
+            if len(classname)==counter_class:
+                break
             # mode = not mode
         elif k == 32:#space bar for object tracking
             break
@@ -256,7 +286,7 @@ def main(status_pause=False,index=0,last_file=None,start=True):
     #track object
 
 
-
+    # print('size_draw_box',size_draw_box)
     width=image_read.shape[1]
     height=image_read.shape[0]
     depth=image_read.shape[2]
@@ -285,7 +315,6 @@ def main(status_pause=False,index=0,last_file=None,start=True):
 
         bboxes = tracker.multi_track(classname, imageRGB)#key #ใส่ list classname แทนเลย
         for bb,bbox in enumerate(bboxes):
-            # print('coco',ii,classname[bb],bbox,image_path)
             color = cv2.cvtColor(np.uint8([[[bb * 255 / len(bboxes), 128, 200]]]),
                 cv2.COLOR_HSV2RGB).squeeze().tolist()
             cv2.putText(image,'class :'+classname[bb],(int(bbox[0]), int(bbox[1])-20),cv2.FONT_HERSHEY_SIMPLEX,0.5,color,2)
@@ -305,7 +334,24 @@ def main(status_pause=False,index=0,last_file=None,start=True):
             li['y1'].append(int(bbox[1]))
             li['x2'].append(int(bbox[2]))
             li['y2'].append(int(bbox[3]))
-            # print('bbox',bbox[0],bbox[1],bbox[2],bbox[3],bb)
+            #check size sku
+            w=int(bbox[2]-bbox[0])
+            h=int(bbox[3]-bbox[1])
+            class_sku=classname[bb]
+            
+            # print('bbox',int(bbox[2]-bbox[0]),int(bbox[3]-bbox[1]),classname[bb])
+            '''
+            check size sku
+            '''
+            status_size_sku,status_w,status_h=check_size_sku(size_draw_box,w,h,bb,class_sku,percent_sku)
+            if status_size_sku == False:
+                status_pause=True
+                ii=ii+index
+                image_path=image_path
+                write_xml(li,width,height,depth)
+                # percent_sku +=2
+                print('***************size_sku_False','status_weight',status_w,'status_height',status_h,class_sku)
+                return status_pause,ii,image_path,start
             '''
             check overlap by iou
             '''
@@ -354,10 +400,18 @@ def main(status_pause=False,index=0,last_file=None,start=True):
     
     return status_pause,ii,image_path,start
 
+
+# if cut_video :
+#     cut_video=False
+#     cut_frame(path_video,classname)
+#     if not os.path.exists('video_success'):
+#         os.makedirs('video_success')
+#     shutil.move(path_video,path_move)
+    # cut_video=False
 while start:
     print('round:',round_counter,status_pause,index,last_file)
     status_pause,index,last_file,start=main(status_pause,index,last_file,start)
-    # status_pause=False
     round_counter+=1
     cv2.destroyAllWindows()
+    
 

@@ -8,3 +8,6 @@ xml-python
 pandas
 regex
 Shapely
+pycopy-shutil
+shutil
+pyinstaller
