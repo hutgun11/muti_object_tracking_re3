@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-chmod +x job.sh
+chmod +x start_2.sh
 conda activate myenv
 
 cd demo

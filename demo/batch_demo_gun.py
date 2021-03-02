@@ -18,7 +18,7 @@ import natsort
 import shutil
 tracker = re3_tracker.Re3Tracker()
 # status_pause=True
-path_video,path_move=main_capture()#capture video to images 
+path_video=main_capture()#capture video to images 
 index=0
 last_file=None
 round_counter=1

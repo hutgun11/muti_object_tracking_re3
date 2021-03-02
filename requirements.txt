@@ -11,3 +11,4 @@ Shapely
 pycopy-shutil
 shutil
 pyinstaller
+get-video-properties

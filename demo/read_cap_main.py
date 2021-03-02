@@ -4,7 +4,7 @@ import math
 import os
 from PIL import Image
 from datetime import datetime
-# from videoprops import get_video_properties
+from videoprops import get_video_properties
 
 folder='video/'
 # folder_success='video_success/'
@@ -16,11 +16,11 @@ for subdir,dirs,files in os.walk(folder):
 # # path_video='video/IMG_9556.MOV'
 # path_video=os.path.join(folder,filevideo)
 
-# props_2 =get_video_properties(path_video)
-def cal_resolution(width,height):
+props_2 =get_video_properties(path_video)
+def cal_resolution(props_2):
     rotate=False
-    # width =props_2['width']
-    # height=props_2['height']
+    width =props_2['width']
+    height=props_2['height']
     if width < height:
         reso = width/height
     else:
@@ -31,7 +31,7 @@ def cal_resolution(width,height):
     else:
         resize_v=768
     return resize_v,rotate
-
+resize_v,rotate=cal_resolution(props_2)
 
 classname=file.strip('mp4MOVmov.')+'_'+datetime.today().strftime('%Y_%m_%d')+'_'
 
@@ -45,7 +45,7 @@ def resize(image,resize_v):
         dim=(w_resize,int(img_h*r))
         image =cv2.resize(image,dim,interpolation=cv2.INTER_AREA)
     return image
-def cut_frame(path_video,classname,rotate,resize_v=576):
+def cut_frame(path_video,classname,resize_v,rotate):
     vidcap =cv2.VideoCapture(path_video)
     success,image = vidcap.read()
     # seconds=0.2
@@ -66,22 +66,13 @@ def cut_frame(path_video,classname,rotate,resize_v=576):
     return "success"
     # vidcap.()
 def main_capture():
-    print("***Input Resolution Video***")
-    width = int(input("Width Video : "))
-    height = int(input("Height Video : "))
-    resize_v,rotate=cal_resolution(width,height)
-    print('****',rotate,resize)
     if not os.path.exists('data'):
         os.makedirs('data')
     try:
-        cut_frame(path_video,classname,rotate,resize_v)
+        cut_frame(path_video,classname,resize_v,rotate)
         if not os.path.exists('video_success'):
             os.makedirs('video_success')
     except:
-        # print('error')
         pass
     return path_video
-# print("***576 = 9:16***")
-# print("***768 = 3:4***")
-# resize_v = input("Resolution Video (576:768): ")
 # main_capture()
